@@ -17,8 +17,6 @@ module Backup
         super
         @path       ||= 'backups'
         @chunk_size ||= 1024 * 1024 * 4 # bytes
-        path.sub!(/^\//, '')
-        #check_configuration
       end
 
       def init_blob_service
@@ -36,7 +34,8 @@ module Backup
           src = File.join(Config.tmp_path, filename)
 
           backup_date = DateTime.parse(`date`).strftime("%Y-%m-%d-%H-%M-%S")
-          dest = "%s-%s" % [ backup_date, filename ]
+          path = @path unless path
+          dest = "%s/%s-%s" % [path, backup_date, filename ]
           Logger.info "Creating Block Blob '#{ container.name }/#{ dest }'..."
           blob = blob_service.create_block_blob(container.name, dest, "")
           chunk_ids = []
@@ -51,15 +50,6 @@ module Backup
           end
           blob_service.commit_blob_blocks(container.name, blob.name, chunk_ids)
         end
-      end
-
-      def check_configuration
-        required = %w{ storage_account, storage_access_key }
-
-        raise Error, <<-EOS if required.map {|name| send(name) }.any?(&:nil?)
-          Configuration Error
-          #{ required.map {|name| "##{ name }"}.join(', ') } are all required
-        EOS
       end
     end
   end
