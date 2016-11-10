@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'azure'
+require 'azure/storage'
 
 module Backup
   module Storage
@@ -20,12 +20,14 @@ module Backup
         path.sub!(/^\//, '')
 
         #check_configuration
-        Azure.config.storage_account_name = storage_account
-        Azure.config.storage_access_key = storage_access_key
+        puts storage_account
+        puts storage_access_key
+        @client = Azure::Storage::Client.create(:storage_account_name => storage_account, :storage_access_key => storage_access_key)
+
       end
 
       def transfer!
-        blob_service = Azure::Blob::BlobService.new
+        blob_service = client.blob_client
         container = blob_service.get_container_properties(container_name)
 
         package.filenames.each do |filename|
