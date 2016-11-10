@@ -82,7 +82,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'open4', '= 1.3.0'
   gem.add_dependency 'pagerduty', '= 2.0.0'
   gem.add_dependency 'pkg-config', '= 1.1.7'
-  gem.add_dependency 'qiniu', '= 6.2.0'
   gem.add_dependency 'rest-client', '= 1.7.3'
   gem.add_dependency 'ruby-hmac', '= 0.4.0'
   gem.add_dependency 'simple_oauth', '= 0.2.0'
