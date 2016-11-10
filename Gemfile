@@ -37,7 +37,7 @@ group :production do
   gem 'json'
   gem 'dogapi'
   gem 'aws-ses'
-  gem 'qiniu', '~> 6.5.1'
+  gem 'qiniu', '~> 6.2.0'
   gem 'azure', '~> 0.6.4'
 end
 
