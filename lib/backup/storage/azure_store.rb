@@ -20,13 +20,11 @@ module Backup
         path.sub!(/^\//, '')
 
         #check_configuration
-
-        Azure.config.storage_account_name = storage_account
-        Azure.config.storage_access_key = storage_access_key
+        Azure::Storage.setup(storage_account_name: storage_account, storage_access_key: storage_access_key)
       end
 
       def transfer!
-        blob_service = ::Azure::Blob::BlobService.new
+        blob_service = Azure::Storage::Blob::BlobService.new
         container = blob_service.get_container_properties(container_name)
 
         package.filenames.each do |filename|
