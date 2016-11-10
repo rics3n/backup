@@ -18,7 +18,7 @@ module Backup
         @path       ||= 'backups'
         @chunk_size ||= 1024 * 1024 * 4 # bytes
         path.sub!(/^\//, '')
-        check_configuration
+        #check_configuration
         @client = Azure::Storage::Client.create(:storage_account_name => storage_account, :storage_access_key => storage_access_key)
       end
 
