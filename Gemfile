@@ -38,7 +38,7 @@ group :production do
   gem 'dogapi'
   gem 'aws-ses'
   gem 'qiniu', '~> 6.2.0'
-  gem 'azure-storage'
+  gem 'azure'
 end
 
 gem 'rspec'

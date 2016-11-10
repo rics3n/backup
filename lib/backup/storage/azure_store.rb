@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'azure/storage'
+require 'azure'
 
 module Backup
   module Storage
@@ -21,10 +21,15 @@ module Backup
         #check_configuration
       end
 
+      def init_blob_service
+        Azure.config.storage_account_name = storage_account
+        Azure.config.storage_access_key = storage_access_key
+
+        Azure::Blob::BlobService.new
+      end
+
       def transfer!
-        @client = Azure::Storage::Client.create(:storage_account_name => storage_account, :storage_access_key => storage_access_key)
-        puts storage_account
-        blob_service = @client.blob_client
+        blob_service = init_blob_service 
         container = blob_service.get_container_properties(container_name)
 
         package.filenames.each do |filename|
