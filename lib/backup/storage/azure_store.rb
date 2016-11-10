@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'azure'
+require 'azure/storage'
 
 module Backup
   module Storage
