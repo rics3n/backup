@@ -26,7 +26,7 @@ module Backup
       end
 
       def transfer!
-        blob_service = Azure::BlobService.new
+        blob_service = ::Azure::Blob::BlobService.new
         container = blob_service.get_container_properties(container_name)
 
         package.filenames.each do |filename|
