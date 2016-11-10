@@ -20,7 +20,8 @@ module Backup
         path.sub!(/^\//, '')
 
         #check_configuration
-        Azure.setup(storage_account_name: storage_account, storage_access_key: storage_access_key)
+        Azure.config.storage_account_name = storage_account
+        Azure.config.storage_access_key = storage_access_key
       end
 
       def transfer!
