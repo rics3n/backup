@@ -9,7 +9,6 @@ GEM
       mail (> 2.2.5)
       mime-types
       xml-simple
-    azure (0.0.0)
     buftok (0.2.0)
     builder (3.2.2)
     coderay (1.1.0)
@@ -200,7 +199,6 @@ PLATFORMS
 
 DEPENDENCIES
   aws-ses
-  azure
   dogapi
   dropbox-sdk (= 1.6.5)
   flowdock
@@ -227,4 +225,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   1.13.6
+   1.13.2
