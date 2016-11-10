@@ -38,6 +38,18 @@ module Backup
       attr_accessor :to
 
       ##
+      # CC receiver Email Address
+      attr_accessor :cc
+
+      ##
+      # BCC receiver Email Address
+      attr_accessor :bcc
+
+      ##
+      # Set reply to email address
+      attr_accessor :reply_to
+
+      ##
       # SMTP Server Address
       attr_accessor :address
 
@@ -148,14 +160,8 @@ module Backup
       # : backup log, if `on_failure` is `true`.
       #
       def notify!(status)
-        tag = case status
-              when :success then '[Backup::Success]'
-              when :warning then '[Backup::Warning]'
-              when :failure then '[Backup::Failure]'
-              end
-
         email = new_email
-        email.subject = "#{ tag } #{ model.label } (#{ model.trigger })"
+        email.subject = message.call(model, :status => status_data_for(status))
 
         send_log = send_log_on.include?(status)
         template = Backup::Template.new({ :model => model, :send_log => send_log })
@@ -182,9 +188,9 @@ module Backup
         options =
             case method
             when 'smtp'
-              { :address              => @address,
+              opts = {
+                :address              => @address,
                 :port                 => @port,
-                :domain               => @domain,
                 :user_name            => @user_name,
                 :password             => @password,
                 :authentication       => @authentication,
@@ -193,6 +199,11 @@ module Backup
                 :ssl                  => @encryption == :ssl,
                 :tls                  => @encryption == :tls
               }
+
+              # Don't override default domain setting if domain not applicable.
+              # ref https://github.com/mikel/mail/blob/2.6.3/lib/mail/network/delivery_methods/smtp.rb#L82
+              opts[:domain] = @domain if @domain
+              opts
             when 'sendmail'
               opts = {}
               opts.merge!(:location  => utility(:sendmail))
@@ -209,13 +220,13 @@ module Backup
             when 'test' then {}
             end
 
-        ::Mail.defaults do
-          delivery_method method.to_sym, options
-        end
-
         email = ::Mail.new
-        email.to   = @to
-        email.from = @from
+        email.delivery_method method.to_sym, options
+        email.to       = to
+        email.from     = from
+        email.cc       = cc
+        email.bcc      = bcc
+        email.reply_to = reply_to
         email
       end
 

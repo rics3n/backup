@@ -64,10 +64,14 @@ shared_examples 'a storage that cycles' do
     let(:pkg_c) { Backup::Package.new(model) }
 
     before do
+      storage.package.time = Time.now
       pkg_a.time = Time.now - 10
       pkg_b.time = Time.now - 20
       pkg_c.time = Time.now - 30
       stored_packages = [pkg_a, pkg_b, pkg_c]
+      (stored_packages + [storage.package]).each do |pkg|
+        pkg.time = pkg.time.strftime('%Y.%m.%d.%H.%M.%S')
+      end
       File.expects(:exist?).with(yaml_file).returns(true)
       File.expects(:zero?).with(yaml_file).returns(false)
       YAML.expects(:load_file).with(yaml_file).returns(stored_packages)
@@ -96,6 +100,39 @@ shared_examples 'a storage that cycles' do
       file = mock
       File.expects(:open).with(yaml_file, 'w').yields(file)
       saved_packages = [storage.package, pkg_a]
+      file.expects(:write).with(saved_packages.to_yaml)
+
+      storage.perform!
+    end
+
+    it 'does cycle when the available packages are more than the keep setting' do
+      storage.expects(:remove!).with(pkg_a).never
+      storage.expects(:remove!).with(pkg_b)
+      storage.expects(:remove!).with(pkg_c)
+
+      storage.keep = 2
+
+      FileUtils.expects(:mkdir_p).with(File.dirname(yaml_file))
+      file = mock
+      File.expects(:open).with(yaml_file, 'w').yields(file)
+      saved_packages = [storage.package, pkg_a]
+      file.expects(:write).with(saved_packages.to_yaml)
+
+      storage.perform!
+    end
+
+
+    it 'does not cycle when the available packages are less than the keep setting' do
+      storage.expects(:remove!).with(pkg_a).never
+      storage.expects(:remove!).with(pkg_b).never
+      storage.expects(:remove!).with(pkg_c).never
+
+      storage.keep = 5
+
+      FileUtils.expects(:mkdir_p).with(File.dirname(yaml_file))
+      file = mock
+      File.expects(:open).with(yaml_file, 'w').yields(file)
+      saved_packages = [storage.package, pkg_a, pkg_b, pkg_c]
       file.expects(:write).with(saved_packages.to_yaml)
 
       storage.perform!
@@ -145,6 +182,13 @@ shared_examples 'a storage that cycles' do
     let(:yaml_file) { File.join(Backup::Config.data_path, 'test_trigger',
                                 "#{ storage_name.split('::').last }.yml") }
     before { storage.keep = 2 }
+    include_examples 'storage cycling'
+  end
+
+  context 'keep as a Time' do
+    let(:yaml_file) { File.join(Backup::Config.data_path, 'test_trigger',
+                                "#{ storage_name.split('::').last }.yml") }
+    before { storage.keep = Time.now - 11 }
     include_examples 'storage cycling'
   end
 

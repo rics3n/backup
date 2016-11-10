@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 # Load Ruby Core Libraries
+require 'time'
 require 'fileutils'
 require 'tempfile'
 require 'syslog'
@@ -48,6 +49,7 @@ module Backup
     autoload :SCP,        File.join(STORAGE_PATH, 'scp')
     autoload :RSync,      File.join(STORAGE_PATH, 'rsync')
     autoload :Local,      File.join(STORAGE_PATH, 'local')
+    autoload :Qiniu,      File.join(STORAGE_PATH, 'qiniu')
     autoload :AzureStore, File.join(STORAGE_PATH, 'azure_store')
   end
 
