@@ -19,12 +19,11 @@ module Backup
         @chunk_size ||= 1024 * 1024 * 4 # bytes
         path.sub!(/^\//, '')
         #check_configuration
-        @client = Azure::Storage::Client.create(:storage_account_name => storage_account, :storage_access_key => storage_access_key)
       end
 
       def transfer!
-
-     
+        @client = Azure::Storage::Client.create(:storage_account_name => storage_account, :storage_access_key => storage_access_key)
+        puts storage_account
         blob_service = @client.blob_client
         container = blob_service.get_container_properties(container_name)
 
